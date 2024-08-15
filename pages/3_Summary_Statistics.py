@@ -7,7 +7,7 @@ import warnings
 warnings.simplefilter(action='ignore', category=UserWarning)
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-df = pd.read_csv('./CO2_Emissions_Canada.csv')
+df = pd.read_csv('https://github.com/claudio1975/CO2_Emissions/tree/main/data/CO2_Emissions_Canada.csv')
 
 if st.checkbox('Show raw data'):
     st.subheader('Raw data')
