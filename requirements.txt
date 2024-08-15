@@ -1,0 +1,11 @@
+streamlit
+shap
+pandas
+numpy
+matplotlib
+seaborn
+scipy
+scikit-learn
+optuna
+lightgbm
+mapie
