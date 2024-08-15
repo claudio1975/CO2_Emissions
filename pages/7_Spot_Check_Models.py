@@ -27,7 +27,7 @@ st.markdown("""
 
 """)
 
-df = pd.read_csv('./CO2_Emissions_Canada.csv')
+df = pd.read_csv('./data/CO2_Emissions_Canada.csv')
 
 # Delete duplicate rows
 df.drop_duplicates(inplace=True)

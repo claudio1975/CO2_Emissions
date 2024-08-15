@@ -12,7 +12,7 @@ import warnings
 warnings.simplefilter(action='ignore', category=UserWarning)
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-df = pd.read_csv('./CO2_Emissions_Canada.csv')
+df = pd.read_csv('./data/CO2_Emissions_Canada.csv')
 
 # Delete duplicate rows
 df.drop_duplicates(inplace=True)
