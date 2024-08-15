@@ -1,6 +1,6 @@
 streamlit
 shap
-pandas==2.1.4
+pandas
 numpy
 matplotlib
 seaborn
