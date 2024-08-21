@@ -15,6 +15,7 @@ from sklearn.preprocessing import MinMaxScaler
 from mapie.regression import MapieQuantileRegressor, MapieRegressor
 from mapie.metrics import regression_coverage_score, regression_mean_width_score
 import shap
+import pickle
 import streamlit as st
 
 import warnings
@@ -26,33 +27,6 @@ st.title("Spot Check Models")
 st.markdown("""
 
 """)
-
-df = pd.read_csv('./data/CO2_Emissions_Canada.csv')
-
-# Delete duplicate rows
-df.drop_duplicates(inplace=True)
-
-# Delete duplicate columns
-# get number of unique values for each column
-counts = df.nunique()
-# record columns to delete
-to_del = [i for i,v in enumerate(counts) if v == 1]
-# drop useless columns
-df.drop(to_del, axis=1, inplace=True)
-
-
-# Rename some features for a practical use
-df_1 = df.rename(columns={
-      "Vehicle Class":"Vehicle_Class","Fuel Type":"Fuel_Type","Engine Size(L)":"Engine_Size",
-      "Fuel Consumption City (L/100 km)":"Fuel_Consumption_City","Fuel Consumption Hwy (L/100 km)": "Fuel_Consumption_Hwy",
-      "Fuel Consumption Comb (L/100 km)": "Fuel_Consumption_Comb",
-      "Fuel Consumption Comb (mpg)":"Fuel_Consumption_Comb_","CO2 Emissions(g/km)":"CO2_Emissions"})
-
-
-# Split data set between target variable and features
-X = df_1.copy()
-y = X['CO2_Emissions']
-X.drop(['CO2_Emissions'], axis=1, inplace=True)
 
 # Functions
 def calculate_predictions_and_scores(Model,X_test,regressor_type, alpha):
@@ -219,269 +193,43 @@ def plot_binned_metric(metric, binned_metrics_df):
     st.pyplot(fig)
 
 
-# Select numerical columns
-numerical_cols = [var for var in X.columns if X[var].dtype in ['int64','float64']]
-
-# Subset with numerical features
-num = X[numerical_cols]
-num2= pd.concat([y,num], axis=1)
-
-
-# Select categorical columns with relatively low cardinality (convenient but arbitrary)
-categorical_cols = [cname for cname in X.columns if
-                    X[cname].nunique() <= 50 and
-                    X[cname].dtype == "object"]
-
-cat=X[categorical_cols]
-cat2=pd.concat([y,cat], axis=1)
-
-
-
-# IQR
-# Calculate the upper and lower limits
-Q1=df_1['CO2_Emissions'].quantile(0.25)
-Q3=df_1['CO2_Emissions'].quantile(0.75)
-IQR=Q3-Q1
-lower=Q1-1.5*IQR
-upper=Q3+1.5*IQR
-
-# Create arrays of Boolean values indicating the outlier rows
-upper_array = df_1[df_1['CO2_Emissions'] > upper].index
-lower_array = df_1[df_1['CO2_Emissions'] < lower].index
-
-# Removing the outliers by the target
-df_2=df_1.drop(index=upper_array, axis=1)
-df_2=df_2.drop(index=lower_array, axis=1)
-
-
-# Split data set between target variable and features
-X_ = df_2.copy()
-y_ = X_['CO2_Emissions']
-X_.drop(['CO2_Emissions'], axis=1, inplace=True)
-num_=X_[numerical_cols]
-cat_=X_[categorical_cols]
-
-# cap residual outliers on features
-i = 'Engine_Size'
-q75, q25 = np.percentile(num_[i].dropna(), [75 ,25])
-iqr = q75 - q25
-min_val = q25 - (iqr*1.5)
-max_val = q75 + (iqr*1.5)
-
-# Create a copy of the DataFrame to avoid SettingWithCopyWarning
-num_out = num_.copy()
-
-# Use .loc to set the values within the IQR range
-num_out.loc[num_out[i] < min_val, i] = min_val
-num_out.loc[num_out[i] > max_val, i] = max_val
-
-# cap residual outliers on features
-i = 'Cylinders'
-q75, q25 = np.percentile(num_[i].dropna(), [75 ,25])
-iqr = q75 - q25
-min_val = q25 - (iqr*1.5)
-max_val = q75 + (iqr*1.5)
-
-# Create a copy of the DataFrame to avoid SettingWithCopyWarning
-num_out = num_.copy()
-
-# Use .loc to set the values within the IQR range
-num_out.loc[num_out[i] < min_val, i] = min_val
-num_out.loc[num_out[i] > max_val, i] = max_val
-
-# cap residual outliers on features
-i = 'Fuel_Consumption_City'
-q75, q25 = np.percentile(num_[i].dropna(), [75 ,25])
-iqr = q75 - q25
-min_val = q25 - (iqr*1.5)
-max_val = q75 + (iqr*1.5)
-
-# Create a copy of the DataFrame to avoid SettingWithCopyWarning
-num_out = num_.copy()
-
-# Use .loc to set the values within the IQR range
-num_out.loc[num_out[i] < min_val, i] = min_val
-num_out.loc[num_out[i] > max_val, i] = max_val
-
-# cap residual outliers on features
-i = 'Fuel_Consumption_Hwy'
-q75, q25 = np.percentile(num_[i].dropna(), [75 ,25])
-iqr = q75 - q25
-min_val = q25 - (iqr*1.5)
-max_val = q75 + (iqr*1.5)
-
-# Create a copy of the DataFrame to avoid SettingWithCopyWarning
-num_out = num_.copy()
-
-# Use .loc to set the values within the IQR range
-num_out.loc[num_out[i] < min_val, i] = min_val
-num_out.loc[num_out[i] > max_val, i] = max_val
-
-# cap residual outliers on features
-i='Fuel_Consumption_Comb'
-q75,q25=np.percentile(num_[i].dropna(), [75,25])
-iqr=q75-q25
-min_val=q25-(iqr*1.5)
-max_val=q75+(iqr*1.5)
-
-# create a copy of the dataframe to avoid Setting With Copy Warning
-num_out=num_.copy()
-
-# use .loc to set the values within the IQR range
-num_out.loc[num_out[i]<min_val,i]=min_val
-num_out.loc[num_out[i]>max_val,i]=max_val
-
-# cap residual outliers on features
-i = 'Fuel_Consumption_Comb_'
-q75, q25 = np.percentile(num_[i].dropna(), [75 ,25])
-iqr = q75 - q25
-min_val = q25 - (iqr*1.5)
-max_val = q75 + (iqr*1.5)
-
-# Create a copy of the DataFrame to avoid SettingWithCopyWarning
-num_out = num_.copy()
-
-# Use .loc to set the values within the IQR range
-num_out.loc[num_out[i] < min_val, i] = min_val
-num_out.loc[num_out[i] > max_val, i] = max_val
-
-
-# Encoding Categorical Variables
-
-cat2_=pd.concat([cat_,y_], axis=1)
-
-# calculate the mean target value per category for each feature and capture the result in a dictionary
-MAKE_LABELS = cat2_.groupby(['Make'])['CO2_Emissions'].mean().to_dict()
-VEHICLE_CLASS_LABELS = cat2_.groupby(['Vehicle_Class'])['CO2_Emissions'].mean().to_dict()
-TRASMISSION_LABELS = cat2_.groupby(['Transmission'])['CO2_Emissions'].mean().to_dict()
-FUEL_TYPE_LABELS = cat2_.groupby(['Fuel_Type'])['CO2_Emissions'].mean().to_dict()
-
-# replace for each feature the labels with the mean target values
-cat2_['Make'] = cat2_['Make'].map(MAKE_LABELS)
-cat2_['Vehicle_Class'] = cat2_['Vehicle_Class'].map(VEHICLE_CLASS_LABELS)
-cat2_['Transmission'] = cat2_['Transmission'].map(TRASMISSION_LABELS)
-cat2_['Fuel_Type'] = cat2_['Fuel_Type'].map(FUEL_TYPE_LABELS)
-
-# Look at the new subset
-target_cat = cat2_.drop(['CO2_Emissions'], axis=1)
-X_all=pd.concat([target_cat, num_out], axis=1)
-
-# Zero Variance Predictors
-
-# Find features with variance equal zero or lower than 0.05
-to_drop = [col for col in X_all.columns if np.var(X_all[col]) ==0]
-# Drop features
-X_all_v = X_all.drop(X_all[to_drop], axis=1)
-
-
-# Correlated Predictors
-
-# Correlation heatmap
-corr_matrix = X_all.corr(method='spearman')
-# Select correlated features and removed it
-# Select upper triangle of correlation matrix
-upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
-# Find index of feature columns with correlation greater than 0.75
-to_drop = [column for column in upper.columns if any(upper[column].abs() > 0.75)]
-# Drop features
-X_all_f = X_all.drop(X_all[to_drop], axis=1)
-
-
-# Split Data Set
-
-# Train/calibration/test split
-X_train_cal, X_test, y_train_cal, y_test = train_test_split(X_all_f, y_, test_size=0.1)
-X_train, X_cal, y_train, y_cal = train_test_split(X_train_cal, y_train_cal, test_size=0.1)
-
-scaling=MinMaxScaler()
-X_all_sc=pd.DataFrame(scaling.fit_transform(X_all_f),columns=['Make', 'Vehicle_Class', 'Transmission', 'Fuel_Type', 'Engine_Size'])
-
-# Train/calibration/test split
-X_train_cal_sc, X_test_sc, y_train_cal_sc, y_test_sc = train_test_split(X_all_sc, y_, test_size=0.1)
-X_train_sc, X_cal_sc, y_train_sc, y_cal_sc = train_test_split(X_train_cal_sc, y_train_cal_sc, test_size=0.1)
-
 st.header("Modelling Results")
 
 alpha=0.1
 
-# LGBM Optimized Estimator
-
-LGBM = LGBMRegressor(
-        objective='quantile',
-        alpha=0.5,
-        n_estimators= 604,
-        learning_rate= 0.028182937892429497,
-        max_depth= 7,
-        min_child_samples=39,
-        num_leaves= 130,
-        n_jobs=-1,
-        random_state=0)
-
-# LR Optimized Estimator
-
-LR=QuantileRegressor(quantile=0.5,alpha=0.29643031153893773, solver='highs')
-
-# Fitting models
-
-LGBM_cqr = MapieQuantileRegressor(estimator=LGBM, cv="split", alpha=alpha, method= "quantile")
-LGBM_cqr.fit(X_train, y_train, X_calib=X_cal, y_calib=y_cal, random_state=0)
-
-np.random.seed(0)
-LR_cqr = MapieQuantileRegressor(estimator=LR, cv="split", alpha=alpha, method= "quantile")
-LR_cqr.fit(X_train, y_train, X_calib=X_cal, y_calib=y_cal, random_state=0)
+X_test=pd.read_csv('./data/X_test.csv')
+y_test=pd.read_csv('./data/y_test.csv')
 
 
-np.random.seed(0)
-LGBM_naive = MapieRegressor(estimator=LGBM, method= "naive")
-LGBM_naive.fit(X_train, y_train)
-
-np.random.seed(0)
-LR_naive = MapieRegressor(estimator=LR,method= "naive")
-LR_naive.fit(X_train, y_train)
-
-
-np.random.seed(0)
-LGBM_jacknife = MapieRegressor(estimator=LGBM, method= "base", cv=5)
-LGBM_jacknife.fit(X_train, y_train)
-
-np.random.seed(0)
-LR_jacknife = MapieRegressor(estimator=LR,method= "base", cv=5)
-LR_jacknife.fit(X_train, y_train)
-
-
-np.random.seed(0)
-LGBM_jacknife_plus = MapieRegressor(estimator=LGBM, method= "plus", cv=5)
-LGBM_jacknife_plus.fit(X_train, y_train)
-
-np.random.seed(0)
-LR_jacknife_plus = MapieRegressor(estimator=LR,method= "plus", cv=5)
-LR_jacknife_plus.fit(X_train, y_train)
+# load the models
+LGBM_cqr = pickle.load(open('LGBM_cqr_model.sav', 'rb'))
+LR_cqr = pickle.load(open('LR_cqr_model.sav', 'rb'))
 
 # Prediction
 
 LGBM_cqr_results, LGBM_cqr_predictions_df = calculate_predictions_and_scores(LGBM_cqr,X_test,"QRegressor", alpha)
-LGBM_naive_results, LGBM_naive_predictions_df = calculate_predictions_and_scores(LGBM_naive,X_test,"Regressor",alpha)
-LGBM_jacknife_results, LGBM_jacknife_predictions_df = calculate_predictions_and_scores(LGBM_jacknife,X_test,"Regressor",alpha)
-LGBM_jacknife_plus_results, LGBM_jacknife_plus_predictions_df = calculate_predictions_and_scores(LGBM_jacknife_plus,X_test,"Regressor",alpha)
+#LGBM_naive_results, LGBM_naive_predictions_df = calculate_predictions_and_scores(LGBM_naive,X_test,"Regressor",alpha)
+#LGBM_jacknife_results, LGBM_jacknife_predictions_df = calculate_predictions_and_scores(LGBM_jacknife,X_test,"Regressor",alpha)
+#LGBM_jacknife_plus_results, LGBM_jacknife_plus_predictions_df = calculate_predictions_and_scores(LGBM_jacknife_plus,X_test,"Regressor",alpha)
 
 LR_cqr_results, LR_cqr_predictions_df = calculate_predictions_and_scores(LR_cqr,X_test,"QRegressor", alpha)
-LR_naive_results, LR_naive_predictions_df = calculate_predictions_and_scores(LR_naive,X_test,"Regressor",alpha)
-LR_jacknife_results, LR_jacknife_predictions_df = calculate_predictions_and_scores(LR_jacknife,X_test,"Regressor",alpha)
-LR_jacknife_plus_results, LR_jacknife_plus_predictions_df = calculate_predictions_and_scores(LR_jacknife_plus,X_test,"Regressor",alpha)
+#LR_naive_results, LR_naive_predictions_df = calculate_predictions_and_scores(LR_naive,X_test,"Regressor",alpha)
+#LR_jacknife_results, LR_jacknife_predictions_df = calculate_predictions_and_scores(LR_jacknife,X_test,"Regressor",alpha)
+#LR_jacknife_plus_results, LR_jacknife_plus_predictions_df = calculate_predictions_and_scores(LR_jacknife_plus,X_test,"Regressor",alpha)
 
 st.subheader("LGBM")
 
 LGBM_cqr_results
-LGBM_naive_results
-LGBM_jacknife_results
-LGBM_jacknife_plus_results
+#LGBM_naive_results
+#LGBM_jacknife_results
+#LGBM_jacknife_plus_results
 
 st.subheader("QR")
 
 LR_naive_results
-LR_cqr_results
-LR_jacknife_results
-LR_jacknife_plus_results
+#LR_cqr_results
+#LR_jacknife_results
+#LR_jacknife_plus_results
 
 st.subheader("Visualization Results")
 
