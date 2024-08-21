@@ -203,7 +203,17 @@ y_test=pd.read_csv('./data/y_test.csv').squeeze()
 
 # load the models
 LGBM_cqr = pickle.load(open('./data/LGBM_cqr_model.sav', 'rb'))
+LGBM_naive = pickle.load(open('./data/LGBM_naive_model.sav', 'rb'))
+LGBM_jacknife = pickle.load(open('./data/LGBM_jacknife_model.sav', 'rb'))
+LGBM_jacknife_plus = pickle.load(open('./data/LGBM_jacknife_plus_model.sav', 'rb'))
+LGBM_explainer = pickle.load(open('./data/LGBM_explainer_model.sav', 'rb'))
+
+
 LR_cqr = pickle.load(open('./data/LR_cqr_model.sav', 'rb'))
+LR_naive = pickle.load(open('./data/LR_naive_model.sav', 'rb'))
+LR_jacknife = pickle.load(open('./data/LR_jacknife_model.sav', 'rb'))
+LR_jacknife_plus = pickle.load(open('./data/LR_jacknife_plus_model.sav', 'rb'))
+LR_explainer = pickle.load(open('./data/LR_explainer_model.sav', 'rb'))
 
                         
 # Prediction
