@@ -213,6 +213,10 @@ if st.checkbox('Show target test data'):
 LGBM_cqr = pickle.load(open('./data/LGBM_cqr_model.sav', 'rb'))
 LR_cqr = pickle.load(open('./data/LR_cqr_model.sav', 'rb'))
 
+if st.checkbox('Show LGBM model'):
+    st.subheader('LGBM model')
+    st.write(LGBM_cqr)
+
 # Prediction
 
 LGBM_cqr_results, LGBM_cqr_predictions_df = calculate_predictions_and_scores(LGBM_cqr,X_test,"QRegressor", alpha)
