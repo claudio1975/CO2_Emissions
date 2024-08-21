@@ -197,7 +197,7 @@ st.header("Modelling Results")
 alpha=0.1
 
 X_test=pd.read_csv('./data/X_test.csv')
-y_test=pd.read_csv('./data/y_test.csv')
+y_test=pd.read_csv('./data/y_test.csv').squeeze()
 
 
 # load the models
