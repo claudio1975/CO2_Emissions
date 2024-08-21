@@ -11,7 +11,6 @@ from sklearn.linear_model import QuantileRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import MinMaxScaler
 from mapie.regression import MapieQuantileRegressor, MapieRegressor
 from mapie.metrics import regression_coverage_score, regression_mean_width_score
 import shap
@@ -202,8 +201,8 @@ y_test=pd.read_csv('./data/y_test.csv')
 
 
 # load the models
-LGBM_cqr = pickle.load(open('LGBM_cqr_model.sav', 'rb'))
-LR_cqr = pickle.load(open('LR_cqr_model.sav', 'rb'))
+LGBM_cqr = pickle.load(open('./data/LGBM_cqr_model.sav', 'rb'))
+LR_cqr = pickle.load(open('./data/LR_cqr_model.sav', 'rb'))
 
 # Prediction
 
