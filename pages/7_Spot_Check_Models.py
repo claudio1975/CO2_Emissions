@@ -210,16 +210,16 @@ if st.checkbox('Show target test data'):
 
 
 # load the models
-LGBM_cqr = pickle.load(open('./data/LGBM_cqr_model.sav', 'rb'))
+#LGBM_cqr = pickle.load(open('./data/LGBM_cqr_model.sav', 'rb'))
 LR_cqr = pickle.load(open('./data/LR_cqr_model.sav', 'rb'))
 
-if st.checkbox('Show LGBM model'):
-    st.subheader('LGBM model')
-    st.write(LGBM_cqr)
+if st.checkbox('Show LR model'):
+    st.subheader('LR model')
+    st.write(LR_cqr)
 
 # Prediction
 
-LGBM_cqr_results, LGBM_cqr_predictions_df = calculate_predictions_and_scores(LGBM_cqr,X_test,"QRegressor", alpha)
+#LGBM_cqr_results, LGBM_cqr_predictions_df = calculate_predictions_and_scores(LGBM_cqr,X_test,"QRegressor", alpha)
 #LGBM_naive_results, LGBM_naive_predictions_df = calculate_predictions_and_scores(LGBM_naive,X_test,"Regressor",alpha)
 #LGBM_jacknife_results, LGBM_jacknife_predictions_df = calculate_predictions_and_scores(LGBM_jacknife,X_test,"Regressor",alpha)
 #LGBM_jacknife_plus_results, LGBM_jacknife_plus_predictions_df = calculate_predictions_and_scores(LGBM_jacknife_plus,X_test,"Regressor",alpha)
@@ -231,7 +231,7 @@ LR_cqr_results, LR_cqr_predictions_df = calculate_predictions_and_scores(LR_cqr,
 
 st.subheader("LGBM")
 
-LGBM_cqr_results
+#LGBM_cqr_results
 #LGBM_naive_results
 #LGBM_jacknife_results
 #LGBM_jacknife_plus_results
