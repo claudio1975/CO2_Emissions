@@ -225,8 +225,8 @@ LGBM_cqr_results
 
 st.subheader("QR")
 
-LR_naive_results
-#LR_cqr_results
+LR_cqr_results
+#LR_naive_results
 #LR_jacknife_results
 #LR_jacknife_plus_results
 
