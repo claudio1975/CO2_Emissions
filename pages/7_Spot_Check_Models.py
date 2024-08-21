@@ -207,7 +207,7 @@ if st.checkbox('Show test data'):
 if st.checkbox('Show target test data'):
     st.subheader('target test data')
     st.write(y_test)
-
+print(type(y_test))
 
 # load the models
 #LGBM_cqr = pickle.load(open('./data/LGBM_cqr_model.sav', 'rb'))
