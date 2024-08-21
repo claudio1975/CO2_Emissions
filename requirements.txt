@@ -9,3 +9,4 @@ scikit-learn
 optuna
 lightgbm
 mapie
+pickle
