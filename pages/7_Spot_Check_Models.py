@@ -199,27 +199,14 @@ alpha=0.1
 X_test=pd.read_csv('./data/X_test.csv')
 y_test=pd.read_csv('./data/y_test.csv')
 
-if st.checkbox('Show test data'):
-    st.subheader('test data')
-    st.write(X_test)
-
-
-if st.checkbox('Show target test data'):
-    st.subheader('target test data')
-    st.write(y_test)
-y_test = pd.Series(y_test)
 
 # load the models
-#LGBM_cqr = pickle.load(open('./data/LGBM_cqr_model.sav', 'rb'))
+LGBM_cqr = pickle.load(open('./data/LGBM_cqr_model.sav', 'rb'))
 LR_cqr = pickle.load(open('./data/LR_cqr_model.sav', 'rb'))
-
-if st.checkbox('Show LR model'):
-    st.subheader('LR model')
-    st.write(LR_cqr)
 
 # Prediction
 
-#LGBM_cqr_results, LGBM_cqr_predictions_df = calculate_predictions_and_scores(LGBM_cqr,X_test,"QRegressor", alpha)
+LGBM_cqr_results, LGBM_cqr_predictions_df = calculate_predictions_and_scores(LGBM_cqr,X_test,"QRegressor", alpha)
 #LGBM_naive_results, LGBM_naive_predictions_df = calculate_predictions_and_scores(LGBM_naive,X_test,"Regressor",alpha)
 #LGBM_jacknife_results, LGBM_jacknife_predictions_df = calculate_predictions_and_scores(LGBM_jacknife,X_test,"Regressor",alpha)
 #LGBM_jacknife_plus_results, LGBM_jacknife_plus_predictions_df = calculate_predictions_and_scores(LGBM_jacknife_plus,X_test,"Regressor",alpha)
