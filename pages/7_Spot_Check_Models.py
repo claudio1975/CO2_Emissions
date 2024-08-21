@@ -196,6 +196,7 @@ st.header("Modelling Results")
 
 alpha=0.1
 
+# load datasets
 X_test=pd.read_csv('./data/X_test.csv')
 y_test=pd.read_csv('./data/y_test.csv').squeeze()
 
@@ -204,31 +205,31 @@ y_test=pd.read_csv('./data/y_test.csv').squeeze()
 LGBM_cqr = pickle.load(open('./data/LGBM_cqr_model.sav', 'rb'))
 LR_cqr = pickle.load(open('./data/LR_cqr_model.sav', 'rb'))
 
+                        
 # Prediction
-
 LGBM_cqr_results, LGBM_cqr_predictions_df = calculate_predictions_and_scores(LGBM_cqr,X_test,"QRegressor", alpha)
-#LGBM_naive_results, LGBM_naive_predictions_df = calculate_predictions_and_scores(LGBM_naive,X_test,"Regressor",alpha)
-#LGBM_jacknife_results, LGBM_jacknife_predictions_df = calculate_predictions_and_scores(LGBM_jacknife,X_test,"Regressor",alpha)
-#LGBM_jacknife_plus_results, LGBM_jacknife_plus_predictions_df = calculate_predictions_and_scores(LGBM_jacknife_plus,X_test,"Regressor",alpha)
+LGBM_naive_results, LGBM_naive_predictions_df = calculate_predictions_and_scores(LGBM_naive,X_test,"Regressor",alpha)
+LGBM_jacknife_results, LGBM_jacknife_predictions_df = calculate_predictions_and_scores(LGBM_jacknife,X_test,"Regressor",alpha)
+LGBM_jacknife_plus_results, LGBM_jacknife_plus_predictions_df = calculate_predictions_and_scores(LGBM_jacknife_plus,X_test,"Regressor",alpha)
 
 LR_cqr_results, LR_cqr_predictions_df = calculate_predictions_and_scores(LR_cqr,X_test,"QRegressor", alpha)
-#LR_naive_results, LR_naive_predictions_df = calculate_predictions_and_scores(LR_naive,X_test,"Regressor",alpha)
-#LR_jacknife_results, LR_jacknife_predictions_df = calculate_predictions_and_scores(LR_jacknife,X_test,"Regressor",alpha)
-#LR_jacknife_plus_results, LR_jacknife_plus_predictions_df = calculate_predictions_and_scores(LR_jacknife_plus,X_test,"Regressor",alpha)
+LR_naive_results, LR_naive_predictions_df = calculate_predictions_and_scores(LR_naive,X_test,"Regressor",alpha)
+LR_jacknife_results, LR_jacknife_predictions_df = calculate_predictions_and_scores(LR_jacknife,X_test,"Regressor",alpha)
+LR_jacknife_plus_results, LR_jacknife_plus_predictions_df = calculate_predictions_and_scores(LR_jacknife_plus,X_test,"Regressor",alpha)
 
 st.subheader("LGBM")
 
 LGBM_cqr_results
-#LGBM_naive_results
-#LGBM_jacknife_results
-#LGBM_jacknife_plus_results
+LGBM_naive_results
+LGBM_jacknife_results
+LGBM_jacknife_plus_results
 
 st.subheader("QR")
 
 LR_cqr_results
-#LR_naive_results
-#LR_jacknife_results
-#LR_jacknife_plus_results
+LR_naive_results
+LR_jacknife_results
+LR_jacknife_plus_results
 
 st.subheader("Visualization Results")
 
@@ -280,17 +281,6 @@ st.subheader("Feature Importance")
 
 # Global SHAP on LGBM
 fig=plt.figure()
-LGBM_ = LGBMRegressor(
-        objective='quantile',
-        alpha=0.5,
-        n_estimators= 604,
-        learning_rate= 0.028182937892429497,
-        max_depth= 7,
-        min_child_samples=39,
-        num_leaves= 130,
-        n_jobs=-1,
-        random_state=0).fit(X_train, y_train)
-LGBM_explainer = shap.TreeExplainer(LGBM_)
 LGBM_shap_values = LGBM_explainer.shap_values(X_test)
 plt.rcParams['figure.figsize'] = (5,5)
 st.write("LGBM SHAP FEATURES IMPORTANCE ON CO2 EMISSIONS")
@@ -299,9 +289,6 @@ st.pyplot(fig)
 
 # Global SHAP on QR
 fig=plt.figure()
-QR_ = QuantileRegressor(quantile=0.5, alpha=0.29643031153893773, solver='highs').fit(X_train, y_train)
-masker = shap.maskers.Independent(X_train)
-QR_explainer = shap.LinearExplainer(QR_, masker=masker)
 QR_shap_values = QR_explainer.shap_values(X_test)
 plt.rcParams['figure.figsize'] = (5,5)
 st.write("QR SHAP FEATURES IMPORTANCE ON CO2 EMISSIONS")
