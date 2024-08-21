@@ -199,6 +199,15 @@ alpha=0.1
 X_test=pd.read_csv('./data/X_test.csv')
 y_test=pd.read_csv('./data/y_test.csv')
 
+if st.checkbox('Show test data'):
+    st.subheader('test data')
+    st.write(X_test)
+
+
+if st.checkbox('Show target test data'):
+    st.subheader('target test data')
+    st.write(y_test)
+
 
 # load the models
 LGBM_cqr = pickle.load(open('./data/LGBM_cqr_model.sav', 'rb'))
