@@ -213,7 +213,7 @@ LR_cqr = pickle.load(open('./data/LR_cqr_model.sav', 'rb'))
 LR_naive = pickle.load(open('./data/LR_naive_model.sav', 'rb'))
 LR_jacknife = pickle.load(open('./data/LR_jacknife_model.sav', 'rb'))
 LR_jacknife_plus = pickle.load(open('./data/LR_jacknife_plus_model.sav', 'rb'))
-LR_explainer = pickle.load(open('./data/LR_explainer_model.sav', 'rb'))
+QR_explainer = pickle.load(open('./data/LR_explainer_model.sav', 'rb'))
 
                         
 # Prediction
