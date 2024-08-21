@@ -218,7 +218,7 @@ LR_cqr_results, LR_cqr_predictions_df = calculate_predictions_and_scores(LR_cqr,
 
 st.subheader("LGBM")
 
-#LGBM_cqr_results
+LGBM_cqr_results
 #LGBM_naive_results
 #LGBM_jacknife_results
 #LGBM_jacknife_plus_results
