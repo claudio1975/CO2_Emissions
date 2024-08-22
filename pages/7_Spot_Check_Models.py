@@ -17,7 +17,6 @@ from mapie.metrics import regression_coverage_score, regression_mean_width_score
 import shap
 import streamlit as st
 import pickle
-import joblib
 
 import warnings
 warnings.simplefilter(action='ignore', category=UserWarning)
