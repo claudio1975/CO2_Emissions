@@ -11,11 +11,12 @@ from sklearn.linear_model import QuantileRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import MinMaxScaler
 from mapie.regression import MapieQuantileRegressor, MapieRegressor
 from mapie.metrics import regression_coverage_score, regression_mean_width_score
 import shap
-import pickle
 import streamlit as st
+import pickle
 
 import warnings
 warnings.simplefilter(action='ignore', category=UserWarning)
@@ -180,8 +181,8 @@ def main_binned_metric(cqr_predictions_df, naive_predictions_df, jacknife_predic
 
 # Plotting binned metric
 def plot_binned_metric(metric, binned_metrics_df):
-    plt.figure(figsize=(8, 5))
-    fig=plt.figure()
+    plt.figure(figsize=(14, 10))
+    fig2=plt.figure()
     sns.barplot(x='Bin', y=metric.capitalize(), hue='Model', data=binned_metrics_df, palette=["green", "blue", "orange", "red"])
     plt.axhline(y=0.9 if metric == 'coverage' else 0.45, color='gray', linestyle='--')
     plt.title(f'Binned {metric.capitalize()} for Different Methods')
@@ -189,7 +190,7 @@ def plot_binned_metric(metric, binned_metrics_df):
     plt.ylabel(metric.capitalize())
     plt.ylim(0, 1 if metric == 'coverage' else None)  # Coverage should be between 0 and 1
     plt.legend(title='Method', fontsize=7, title_fontsize=7)
-    st.pyplot(fig)
+    st.pyplot(fig2)
 
 
 st.header("Modelling Results")
@@ -198,6 +199,8 @@ alpha=0.1
 
 # load datasets
 X_test=pd.read_csv('./data/X_test.csv')
+X_train=pd.read_csv('./data/X_train.csv')
+y_train=pd.read_csv('./data/y_train.csv').squeeze()
 y_test=pd.read_csv('./data/y_test.csv').squeeze()
 
 
@@ -206,40 +209,45 @@ LGBM_cqr = pickle.load(open('./data/LGBM_cqr_model.sav', 'rb'))
 LGBM_naive = pickle.load(open('./data/LGBM_naive_model.sav', 'rb'))
 LGBM_jacknife = pickle.load(open('./data/LGBM_jacknife_model.sav', 'rb'))
 LGBM_jacknife_plus = pickle.load(open('./data/LGBM_jacknife_plus_model.sav', 'rb'))
-#LGBM_explainer = pickle.load(open('./data/LGBM_explainer_model.sav', 'rb'))
+LGBM_ = pickle.load(open('./data/LGBM_explainer_model.sav', 'rb'))
 
 
-LR_cqr = pickle.load(open('./data/LR_cqr_model.sav', 'rb'))
-LR_naive = pickle.load(open('./data/LR_naive_model.sav', 'rb'))
-LR_jacknife = pickle.load(open('./data/LR_jacknife_model.sav', 'rb'))
-LR_jacknife_plus = pickle.load(open('./data/LR_jacknife_plus_model.sav', 'rb'))
-#QR_explainer = pickle.load(open('./data/LR_explainer_model.sav', 'rb'))
+QR_cqr = pickle.load(open('./data/QR_cqr_model.sav', 'rb'))
+QR_naive = pickle.load(open('./data/QR_naive_model.sav', 'rb'))
+QR_jacknife = pickle.load(open('./data/QR_jacknife_model.sav', 'rb'))
+QR_jacknife_plus = pickle.load(open('./data/QR_jacknife_plus_model.sav', 'rb'))
+QR_ = pickle.load(open('./data/QR_explainer_model.sav', 'rb'))
 
-                        
+
 # Prediction
+
 LGBM_cqr_results, LGBM_cqr_predictions_df = calculate_predictions_and_scores(LGBM_cqr,X_test,"QRegressor", alpha)
 LGBM_naive_results, LGBM_naive_predictions_df = calculate_predictions_and_scores(LGBM_naive,X_test,"Regressor",alpha)
 LGBM_jacknife_results, LGBM_jacknife_predictions_df = calculate_predictions_and_scores(LGBM_jacknife,X_test,"Regressor",alpha)
 LGBM_jacknife_plus_results, LGBM_jacknife_plus_predictions_df = calculate_predictions_and_scores(LGBM_jacknife_plus,X_test,"Regressor",alpha)
 
-LR_cqr_results, LR_cqr_predictions_df = calculate_predictions_and_scores(LR_cqr,X_test,"QRegressor", alpha)
-LR_naive_results, LR_naive_predictions_df = calculate_predictions_and_scores(LR_naive,X_test,"Regressor",alpha)
-LR_jacknife_results, LR_jacknife_predictions_df = calculate_predictions_and_scores(LR_jacknife,X_test,"Regressor",alpha)
-LR_jacknife_plus_results, LR_jacknife_plus_predictions_df = calculate_predictions_and_scores(LR_jacknife_plus,X_test,"Regressor",alpha)
+QR_cqr_results, QR_cqr_predictions_df = calculate_predictions_and_scores(QR_cqr,X_test,"QRegressor", alpha)
+QR_naive_results, QR_naive_predictions_df = calculate_predictions_and_scores(QR_naive,X_test,"Regressor",alpha)
+QR_jacknife_results, QR_jacknife_predictions_df = calculate_predictions_and_scores(QR_jacknife,X_test,"Regressor",alpha)
+QR_jacknife_plus_results, QR_jacknife_plus_predictions_df = calculate_predictions_and_scores(QR_jacknife_plus,X_test,"Regressor",alpha)
 
-st.subheader("LGBM")
+#st.subheader("LGBM")
 
-LGBM_cqr_results
-LGBM_naive_results
-LGBM_jacknife_results
-LGBM_jacknife_plus_results
+def print_with_title(df, title):
+    st.write(f"{title}\n")
+    st.write(df)
 
-st.subheader("QR")
+print_with_title(pd.DataFrame([LGBM_cqr_results]), "LGBM_cqr_results")
+print_with_title(pd.DataFrame([LGBM_naive_results]), "LGBM_naive_results")
+print_with_title(pd.DataFrame([LGBM_jacknife_results]), "LGBM_jacknife_results")
+print_with_title(pd.DataFrame([LGBM_jacknife_plus_results]), "LGBM_jacknife_plus_results")
 
-LR_cqr_results
-LR_naive_results
-LR_jacknife_results
-LR_jacknife_plus_results
+#st.subheader("QR")
+
+print_with_title(pd.DataFrame([QR_cqr_results]), "QR_cqr_results")
+print_with_title(pd.DataFrame([QR_naive_results]), "QR_naive_results")
+print_with_title(pd.DataFrame([QR_jacknife_results]), "QR_jacknife_results")
+print_with_title(pd.DataFrame([QR_jacknife_plus_results]), "QR_jacknife_plus_results")
 
 st.subheader("Visualization Results")
 
@@ -252,55 +260,66 @@ LGBM_models_predictions = [
 ]
 
 # Prepare model results and predictions for plotting
-LR_models_predictions = [
-    ("LR_CQR", LR_cqr_predictions_df),
-    ("LR_Naive", LR_naive_predictions_df),
-    ("LR_Jackknife", LR_jacknife_predictions_df),
-    ("LR_Jackknife+", LR_jacknife_plus_predictions_df)
+QR_models_predictions = [
+    ("QR_CQR", QR_cqr_predictions_df),
+    ("QR_Naive", QR_naive_predictions_df),
+    ("QR_Jackknife", QR_jacknife_predictions_df),
+    ("QR_Jackknife+", QR_jacknife_plus_predictions_df)
 ]
 
-st.subheader("LGBM")
+#st.subheader("LGBM")
 
 # Plot LGBM model errors
+st.write("LGBM model errors")
 plot_error(LGBM_models_predictions, calculate_errors)
 
 # Plot LGBM model predictions
+st.write("LGBM model predictions")
 plot_prediction(LGBM_models_predictions)
 
 binned_coverage_df = main_binned_metric(LGBM_cqr_predictions_df, LGBM_naive_predictions_df, LGBM_jacknife_predictions_df, LGBM_jacknife_plus_predictions_df, metric='coverage')
+st.write("LGBM binned coverage")
 plot_binned_metric('coverage', binned_coverage_df)
 
 binned_width_df = main_binned_metric(LGBM_cqr_predictions_df, LGBM_naive_predictions_df, LGBM_jacknife_predictions_df, LGBM_jacknife_plus_predictions_df, metric='width')
+st.write("LGBM binned width")
 plot_binned_metric('width', binned_width_df)
 
-st.subheader("QR")
+#st.subheader("QR")
 
 # Plot QR model errors
-plot_error(LR_models_predictions, calculate_errors)
+st.write("QR model errors")
+plot_error(QR_models_predictions, calculate_errors)
 
 # Plot LR model predictions
-plot_prediction(LR_models_predictions)
+st.write("QR model predictions")
+plot_prediction(QR_models_predictions)
 
-binned_coverage_df = main_binned_metric(LR_cqr_predictions_df, LR_naive_predictions_df, LR_jacknife_predictions_df, LR_jacknife_plus_predictions_df, metric='coverage')
+binned_coverage_df = main_binned_metric(QR_cqr_predictions_df, QR_naive_predictions_df, QR_jacknife_predictions_df, QR_jacknife_plus_predictions_df, metric='coverage')
+st.write("QR binned coverage")
 plot_binned_metric('coverage', binned_coverage_df)
 
-binned_width_df = main_binned_metric(LR_cqr_predictions_df, LR_naive_predictions_df, LR_jacknife_predictions_df, LR_jacknife_plus_predictions_df, metric='width')
+binned_width_df = main_binned_metric(QR_cqr_predictions_df, QR_naive_predictions_df, QR_jacknife_predictions_df, QR_jacknife_plus_predictions_df, metric='width')
+st.write("QR binned width")
 plot_binned_metric('width', binned_width_df)
 
 st.subheader("Feature Importance")
 
 # Global SHAP on LGBM
-#fig=plt.figure()
-#LGBM_shap_values = LGBM_explainer.shap_values(X_test)
-#plt.rcParams['figure.figsize'] = (5,5)
-#st.write("LGBM SHAP FEATURES IMPORTANCE ON CO2 EMISSIONS")
-#shap.summary_plot(LGBM_shap_values, features=X_test, feature_names=X_all_f.columns, plot_type='bar', show=False)
-#st.pyplot(fig)
+fig=plt.figure()
+LGBM_explainer = shap.TreeExplainer(LGBM_)
+LGBM_shap_values = LGBM_explainer.shap_values(X_test)
+plt.rcParams['figure.figsize'] = (5,5)
+st.write("LGBM SHAP FEATURES IMPORTANCE ON CO2 EMISSIONS")
+shap.summary_plot(LGBM_shap_values, features=X_test, feature_names=X_test.columns, plot_type='bar', show=False)
+st.pyplot(fig)
 
 # Global SHAP on QR
-#fig=plt.figure()
-#QR_shap_values = QR_explainer.shap_values(X_test)
-#plt.rcParams['figure.figsize'] = (5,5)
-#st.write("QR SHAP FEATURES IMPORTANCE ON CO2 EMISSIONS")
-#shap.summary_plot(QR_shap_values, features=X_test, feature_names=X_test.columns, plot_type='bar', show=False)
-#st.pyplot(fig)
+fig=plt.figure()
+masker = shap.maskers.Independent(X_train)
+QR_explainer = shap.LinearExplainer(QR_, masker=masker)
+QR_shap_values = QR_explainer.shap_values(X_test)
+plt.rcParams['figure.figsize'] = (5,5)
+st.write("QR SHAP FEATURES IMPORTANCE ON CO2 EMISSIONS")
+shap.summary_plot(QR_shap_values, features=X_test, feature_names=X_test.columns, plot_type='bar', show=False)
+st.pyplot(fig)
