@@ -8,5 +8,5 @@ scipy
 scikit-learn
 optuna
 lightgbm
-mapie==0.46.0
+mapie=='0.46.0'
 
