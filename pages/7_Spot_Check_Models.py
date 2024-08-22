@@ -17,6 +17,7 @@ from mapie.metrics import regression_coverage_score, regression_mean_width_score
 import shap
 import streamlit as st
 import pickle
+import joblib
 
 import warnings
 warnings.simplefilter(action='ignore', category=UserWarning)
@@ -209,14 +210,14 @@ LGBM_cqr = pickle.load(open('./data/LGBM_cqr_model.sav', 'rb'))
 LGBM_naive = pickle.load(open('./data/LGBM_naive_model.sav', 'rb'))
 LGBM_jacknife = pickle.load(open('./data/LGBM_jacknife_model.sav', 'rb'))
 LGBM_jacknife_plus = pickle.load(open('./data/LGBM_jacknife_plus_model.sav', 'rb'))
-LGBM_ = pickle.load(open('./data/LGBM_explainer_model.sav', 'rb'))
+#LGBM_ = pickle.load(open('./data/LGBM_explainer_model.sav', 'rb'))
 
 
 QR_cqr = pickle.load(open('./data/QR_cqr_model.sav', 'rb'))
 QR_naive = pickle.load(open('./data/QR_naive_model.sav', 'rb'))
 QR_jacknife = pickle.load(open('./data/QR_jacknife_model.sav', 'rb'))
 QR_jacknife_plus = pickle.load(open('./data/QR_jacknife_plus_model.sav', 'rb'))
-QR_ = pickle.load(open('./data/QR_explainer_model.sav', 'rb'))
+#QR_ = pickle.load(open('./data/QR_explainer_model.sav', 'rb'))
 
 
 # Prediction
