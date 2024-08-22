@@ -217,7 +217,7 @@ QR_cqr = pickle.load(open('./data/QR_cqr_model.sav', 'rb'))
 QR_naive = pickle.load(open('./data/QR_naive_model.sav', 'rb'))
 QR_jacknife = pickle.load(open('./data/QR_jacknife_model.sav', 'rb'))
 QR_jacknife_plus = pickle.load(open('./data/QR_jacknife_plus_model.sav', 'rb'))
-#QR_ = pickle.load(open('./data/QR_explainer_model.sav', 'rb'))
+QR_ = pickle.load(open('./data/QR_explainer_model.sav', 'rb'))
 
 
 # Prediction
@@ -307,13 +307,13 @@ plot_binned_metric('width', binned_width_df)
 st.subheader("Feature Importance")
 
 # Global SHAP on LGBM
-fig=plt.figure()
-LGBM_explainer = shap.TreeExplainer(LGBM_)
-LGBM_shap_values = LGBM_explainer.shap_values(X_test)
-plt.rcParams['figure.figsize'] = (5,5)
-st.write("LGBM SHAP FEATURES IMPORTANCE ON CO2 EMISSIONS")
-shap.summary_plot(LGBM_shap_values, features=X_test, feature_names=X_test.columns, plot_type='bar', show=False)
-st.pyplot(fig)
+#fig=plt.figure()
+#LGBM_explainer = shap.TreeExplainer(LGBM_)
+#LGBM_shap_values = LGBM_explainer.shap_values(X_test)
+#plt.rcParams['figure.figsize'] = (5,5)
+#st.write("LGBM SHAP FEATURES IMPORTANCE ON CO2 EMISSIONS")
+#shap.summary_plot(LGBM_shap_values, features=X_test, feature_names=X_test.columns, plot_type='bar', show=False)
+#st.pyplot(fig)
 
 # Global SHAP on QR
 fig=plt.figure()
