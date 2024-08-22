@@ -1,5 +1,5 @@
 streamlit
-shap
+shap=='0.46.0'
 pandas
 numpy
 matplotlib
@@ -8,5 +8,5 @@ scipy
 scikit-learn
 optuna
 lightgbm
-mapie=='0.46.0'
+mapie
 
