@@ -6,5 +6,5 @@ st.markdown("""
         **👈 Select a page from the dropdown on the left** to see some applications of the app!"""
         )
 
-st.markdown("""read the [article]!(https://medium.com/@c.giancaterino/predict-co2-emissions-by-vehicles-with-conformal-prediction-3d40a5e8c136)""")
+st.markdown("""read the (article)![https://medium.com/@c.giancaterino/predict-co2-emissions-by-vehicles-with-conformal-prediction-3d40a5e8c136]""")
 
